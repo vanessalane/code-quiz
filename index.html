@@ -3,74 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quiz</title>
+    <title>Code Quiz</title>
 </head>
 <body>
-    <h1>A Simple Math Quiz!</h1>
-    <p id="currentScore"></p>
-    <p id="question"></p>
-    <div id="buttons">
-        <button id="startGameButton" onclick="startQuiz()">Start A New Game</button>
-        <button id="trueButton" onclick="submitAnswer(true);" style="display:none">True</button>
-        <button id="falseButton" onclick="submitAnswer(false);"  style="display:none">False</button>
-    </div>
-    <script>
-        // get elements from the DOM
-        var scoreElement = document.getElementById("currentScore");
-        var questionElement = document.getElementById("question");
-        var startGameButton = document.getElementById("startGameButton");
-        var trueButton = document.getElementById("trueButton");
-        var falseButton = document.getElementById("falseButton");
-
-        // setup variables for the quiz
-        var score = 0;
-        var questionNumber = 0;
-        var myQuestions = [
-                { question: '2+2=4', answer: true },
-                { question: '2+3=4', answer: false },
-                { question: '2+1=3', answer: true },
-                { question: '2*3=4', answer: false },
-                { question: '2*5=10', answer: true }
-            ];
-        
-        function startQuiz() {
-            // quiz() is called when startGameButton was clicked, so hide the startGameButton
-            startGameButton.style.display = "none";
-            // surface the first question
-            surfaceQuestion(myQuestions[questionNumber]);
-        }
-
-        function surfaceQuestion(questionObject) {
-            // surface the score
-            scoreElement.textContent = `Your score: ${score}`;
-            // surface the question provided
-            var questionValue = questionObject.question;
-            questionElement.textContent = questionValue;
-            // display the possible response buttons
-            trueButton.style.display = "inline-block";
-            falseButton.style.display = "inline-block";
-        }
-
-        function submitAnswer(answer) {
-            // get the questions from storage
-            var currentQuestion = myQuestions[questionNumber];
-            var expectedAnswer = currentQuestion.answer;
-            var providedAnswer = answer;
-            if (expectedAnswer == providedAnswer) {
-                score++;
-            }
-            questionNumber++;
-            if (questionNumber < myQuestions.length) {
-                // keep surfacing questions if you haven't surfaced all questions
-                surfaceQuestion(myQuestions[questionNumber]);
-            } else {
-                // otherwise, tell the user the game is over and reset the buttons.
-                questionElement.textContent = "Game over!"
-                startGameButton.style.display = "inline-block";
-                trueButton.style.display = "none";
-                falseButton.style.display = "none";
-            }
-        }
-    </script>
+    <header>
+        <button id="highScores">High Scores</button>
+        <h1>Code Quiz</h1>
+        <div>
+            <p id="timer">Time Left: 5:00</p>
+            <p id="currentScore"></p>
+        </div>
+    </header>
+    <main>
+        <p id="question">Question</p>
+        <div id="buttons">
+            <button id="startButton">Start the Quiz</button>
+        </div>
+    </main>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
