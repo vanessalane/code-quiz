@@ -1,13 +1,15 @@
 // get relevant DOM elements
 var startButton = document.getElementById("startButton");
 var timerElement = document.getElementById("timer");
-var scoreElement = document.getElementById("score");
+var scoreElement = document.getElementById("currentScore");
 var questionElement = document.getElementById("question-text");
 var answersContainerElement = document.getElementById("answers-container");
+var answerMessageElement = document.getElementById("answer-message");
 
 // define global variables
+var timeLeft = 300000;
 var score = 0;
-var questionsAnswered = 0;
+var questionId = 0;
 var questions = [
     {
         question: "Which of the following is NOT a valid way to define a JS variable?",
@@ -53,10 +55,18 @@ var questions = [
 ]
 
 var startQuiz = function() {
+    // setup the header
     startButton.style.display = "none";
+    scoreElement.textContent = "Current Score: " + score;
     timerElement.textContent = "Time Left: 5:00";
+    // start displaying the questions
     displayQuestion();
-    var timeLeft = 300000;
+    answerMessageElement.textContent = "";
+    // start the timer
+    runTimer();
+}
+
+var runTimer = function() {
     var timer = setInterval(function () {
         timeLeft = timeLeft - 1000;
         // parse the time so that it's easier for the user to read
@@ -78,16 +88,36 @@ var startQuiz = function() {
 
 var displayQuestion = function() {
     // add the question to the dom
-    questionElement.textContent = questions[0].question;
+    questionElement.textContent = questions[questionId].question;
     // create the answer elements
-    for (i=0; i < questions[0].answers.length; i++) {
+    for (i=0; i < questions[questionId].answers.length; i++) {
         var answerButton = document.createElement("button");
-        answerButton.class = "answer-button";
+        answerButton.className = "answer-button";
         answerButton.id = i;
-        answerButton.textContent = questions[0].answers[i].text;
-        console.log(answerButton);
+        answerButton.textContent = questions[questionId].answers[i].text;
         answersContainerElement.appendChild(answerButton);
     }
 }
 
+var answerClickHandler = function(event) {
+    // figure out the answer and the score
+    var answerId = event.target.id;
+    var answerScore = questions[questionId].answers[answerId].score;
+    // apply a 10 second penalty for a wrong answer
+    if (answerScore === 0) {
+        timeLeft -= 10000;
+        answerMessageElement.textContent = "Wrong answer!";
+    } 
+    // update the total score based on the answerScore
+    else {
+        score += answerScore;
+        scoreElement.textContent = "Current Score: " + score;
+        answerMessageElement.textContent = "Correct!";
+    }
+    setTimeout(function() {
+        answerMessageElement.textContent = "";
+    }, 2000)
+}
+
 startButton.addEventListener("click", startQuiz);
+answersContainerElement.addEventListener("click", answerClickHandler);
