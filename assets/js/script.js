@@ -202,9 +202,15 @@ var highScoreSubmitHandler = function(event) {
     if (!playerName) {
         playerName = "Anonymous";
     }
+    // get the time the score was recorded
+    var timestamp = new Date();
+    var date = (timestamp.getMonth() + 1) + "/" + timestamp.getDate() + '/' + timestamp.getFullYear();
+    var time = timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds();
+    var dateTime = date + ' ' + time;
     var scoreObject = {
         player: playerName,
-        score: score
+        score: score,
+        date: dateTime
     }
     // add it to the highScores array
     highScores.push(scoreObject);
@@ -217,30 +223,62 @@ var highScoreSubmitHandler = function(event) {
 }
 
 var displayLeaderboard = function() {
+    // hide the quiz section
+    leaderboardButton.style.display = "none";
+    startButton.style.display="none";
+    timerElement.textContent = "";
+    finalScoreElement.textContent = "";
+    question.textContent = "";
+    answersContainerElement.innerHTML = "";
+
+    // get all of the scores from localStorage
     loadedScores = JSON.parse(localStorage.getItem("highScores"));
-    // create the list element
-    var scoresContainer = document.createElement("div");
-    scoresContainer.className = "scores-container";
-    for (let i = 0; i < loadedScores.length; i++) {
-        // create the container and high score information
-        var scoreElement = document.createElement("div");
-        scoreElement.class="score";
-        scoreElement.innerHTML = "<p class='high-score-player'>" + loadedScores[i].player + "</p><p class='high-score-value'>" + loadedScores[i].score + "</p>";
-        // append the container to the high scores
-        scoresContainer.append(scoreElement);
+    if (!loadedScores) {
+        leaderboardSection.innerHTML = "<h2>Leaderboard</h2><p>No scores saved!</p>";
+    } else {
+        leaderboardSection.innerHTML = "<h2>Leaderboard</h2>";
+        // create the list element
+        var scoresList = document.createElement("ol");
+        scoresList.className = "scores-list";
+        for (let i = 0; i < loadedScores.length; i++) {
+            // create the container and high score information
+            var scoreListItem = document.createElement("li");
+            scoreListItem.class="score";
+            scoreListItem.innerHTML = "<p class='high-score-player'>" + loadedScores[i].player + " - " + loadedScores[i].score + " points - " + loadedScores[i].date + "</p>";
+            // append the container to the high scores
+            scoresList.append(scoreListItem);
+        }
+        // append the list to the leaderboard section
+        leaderboardSection.appendChild(scoresList);
+
+        // create clear high scores button and append to the end of the leaderboard
+        var clearLeaderboardButton = document.createElement("button");
+        clearLeaderboardButton.class="leaderboard-button";
+        clearLeaderboardButton.textContent = "Clear High Scores";
+        clearLeaderboardButton.onclick = clearLeaderboard;
+        leaderboardSection.appendChild(clearLeaderboardButton);
     }
-    // append the list to the leaderboard section
-    leaderboardSection.appendChild(scoresContainer);
-    // create back button and append to the end of the leaderboard
+
+    // create exit button and append to the end of the leaderboard
     var exitLeaderboardButton = document.createElement("button");
     exitLeaderboardButton.class="leaderboard-button";
     exitLeaderboardButton.textContent = "Exit Leaderboard";
     exitLeaderboardButton.onclick = hideLeaderboard;
     leaderboardSection.appendChild(exitLeaderboardButton);
+
 }
 
 var hideLeaderboard = function() {
     leaderboardSection.innerHTML = "";
+    leaderboardButton.style.display = "inline-block";
+    startButton.style.display = "inline-block";
+}
+
+var clearLeaderboard = function() {
+    localStorage.clear();
+    leaderboardButton.style.display = "inline-block";
+    leaderboardSection.innerHTML = "";
+    startButton.style.display = "inline-block";
 }
 
 // EVENT HANDLERS
