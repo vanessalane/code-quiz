@@ -1,17 +1,19 @@
-// get relevant DOM elements
+// GLOBAL VARIABLES
+// quiz admin DOM elements
 var startButton = document.getElementById("start-quiz");
-var saveScoreButton = document.getElementById("save-score");
+var timeLeft;
 var timerElement = document.getElementById("timer");
+// score variables
 var finalScoreElement = document.getElementById("final-score");
+var addHighScoreButton = document.getElementById("save-high-score");
+var highScoreContainer = document.getElementById("high-score-content");
+var score;
+var highScores = [];
+// quiz question and answer variables
 var quizContentElement = document.getElementById("quiz-content");
 var questionElement = document.getElementById("question");
 var answersContainerElement = document.getElementById("answers-container");
 var answerMessageElement = document.getElementById("answer-message");
-var highScoreElement = document.getElementById("high-score-content");
-
-// define global variables
-var timeLeft;
-var score;
 var questionsAnswered;
 var questions = [
     {
@@ -56,8 +58,8 @@ var questions = [
         ]
     }
 ]
-var highScores = [];
 
+// FUNCTIONS
 var startQuiz = function() {
     // set default values
     timeLeft = 300000;
@@ -67,7 +69,7 @@ var startQuiz = function() {
     finalScoreElement.textContent = "";
     // hide the start and save score buttons
     startButton.style.display = "none";
-    saveScoreButton.style.display = "none";
+    addHighScoreButton.style.display = "none";
     // display the timer
     timerElement.textContent = "Time Left: 5:00";
     // display the first question
@@ -109,7 +111,7 @@ var endQuiz = function() {
     finalScoreElement.textContent = "Final Score: " + score;
     // display the start game and save score buttons
     startButton.style.display = "inline-block";
-    saveScoreButton.style.display = "inline-block";
+    addHighScoreButton.style.display = "inline-block";
 }
 
 var displayQuestion = function() {
@@ -156,33 +158,33 @@ var answerClickHandler = function(event) {
     }, 2000)
 }
 
-var saveScoreClickHandler = function(event) {
+var addHighScoreClickHandler = function(event) {
     // create a container to hold the player name form
-    var saveScoreForm = document.createElement("form");
-    saveScoreForm.class = "save-score-form";
+    var highScoreForm = document.createElement("form");
+    highScoreForm.class = "save-score-form";
     // create the label for the input
     var playerNameLabel = document.createElement("label");
     playerNameLabel.setAttribute("for", "player-name")
     playerNameLabel.textContent = "Player:"
-    saveScoreForm.append(playerNameLabel);
+    highScoreForm.append(playerNameLabel);
     // create the input
     var playerNameElement = document.createElement("input");
     playerNameElement.type = "text";
     playerNameElement.name = "player-name";
     playerNameElement.placeholder = "Name or Initials";
-    saveScoreForm.append(playerNameElement);
+    highScoreForm.append(playerNameElement);
     // create the button
     var playerNameSubmit = document.createElement("button");
     playerNameSubmit.type = "submit";
-    playerNameSubmit.textContent = "Save My Score"
-    saveScoreForm.append(playerNameSubmit);
-    // hide the other button
-    saveScoreButton.style.display = "none";
+    playerNameSubmit.textContent = "Add My High Score"
+    highScoreForm.append(playerNameSubmit);
+    // hide the Save Score button
+    addHighScoreButton.style.display = "none";
     // add the form to the DOM
-    highScoreElement.append(saveScoreForm);
+    highScoreContainer.append(highScoreForm);
 }
 
-var saveScoreFormHandler = function(event) {
+var highScoreSubmitHandler = function(event) {
     event.preventDefault();
     var playerName = event.target.querySelector("input[name='player-name']").value;
     if (!playerName) {
@@ -198,10 +200,11 @@ var saveScoreFormHandler = function(event) {
     // add it to local storage
     localStorage.setItem("highScores", JSON.stringify(highScores));
     // hide the form
-    highScoreElement.innerHTML = '';
+    highScoreContainer.innerHTML = '';
 }
 
+// EVENT HANDLERS
 startButton.addEventListener("click", startQuiz);
 answersContainerElement.addEventListener("click", answerClickHandler);
-saveScoreButton.addEventListener("click", saveScoreClickHandler);
-highScoreElement.addEventListener("submit", saveScoreFormHandler);
+addHighScoreButton.addEventListener("click", addHighScoreClickHandler);
+highScoreContainer.addEventListener("submit", highScoreSubmitHandler);
