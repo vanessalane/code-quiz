@@ -16,3 +16,18 @@ GIVEN I am taking a code quiz:
 - WHEN I answer a question incorrectly THEN time is subtracted from the clock
 - WHEN all questions are answered or the timer reaches 0 THEN the game is over
 - WHEN the game is over THEN I can save my initials and score
+
+# Screenshots
+## Home Page
+![HomePage](assets/img/quizScreenshot4.png)
+
+## Quiz Question
+![QuizQuestion](assets/img/quizScreenshot3.png)
+
+## Finish Page
+![FinishPage](assets/img/quizScreenshot1.png)
+
+## Leaderboard
+![Leaderboard](assets/img/quizScreenshot2.png)
+
+
