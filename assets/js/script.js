@@ -155,9 +155,10 @@ var endQuiz = function() {
     answerMessageElement.textContent = "";
     // display the user's score
     finalScoreElement.textContent = "Final Score: " + score;
-    // display the start game button
+    // display the start game and leaderboard buttons
     startButton.style.display = "inline-block";
     startButton.textContent = "Retake Quiz"
+    leaderboardButton.style.display = "inline-block";
     // handle high scores
     if (score >= highScore) {
         highScore = score;
@@ -216,24 +217,30 @@ var highScoreSubmitHandler = function(event) {
 }
 
 var displayLeaderboard = function() {
-    highScores = JSON.parse(localStorage.getItem("highScores"));
+    loadedScores = JSON.parse(localStorage.getItem("highScores"));
     // create the list element
-    var highScoresListElement = document.createElement("ol");
-    highScoresListElement.className = "high-scores-list";
-    for (let i = 0; i < highScores.length; i++) {
-        // create the high score list item
-        var highScoreElement = document.createElement("li");
-        highScoreElement.className = "high-score-list-item";
+    var scoresContainer = document.createElement("div");
+    scoresContainer.className = "scores-container";
+    for (let i = 0; i < loadedScores.length; i++) {
         // create the container and high score information
-        var highScoreContainer = document.createElement("div");
-        highScoreContainer.class="high-score-container";
-        highScoreContainer.innerHTML = "<h3 class='high-score-player'>" + highScores[i].player + "</h3><span class='high-score-value'>" + highScores[i].score + "</span>";
-        // append the list item to the list
-        highScoreElement.append(highScoreContainer);
-        highScoresListElement.append(highScoreElement);
+        var scoreElement = document.createElement("div");
+        scoreElement.class="score";
+        scoreElement.innerHTML = "<p class='high-score-player'>" + loadedScores[i].player + "</p><p class='high-score-value'>" + loadedScores[i].score + "</p>";
+        // append the container to the high scores
+        scoresContainer.append(scoreElement);
     }
     // append the list to the leaderboard section
-    leaderboardSection.appendChild(highScoresListElement);
+    leaderboardSection.appendChild(scoresContainer);
+    // create back button and append to the end of the leaderboard
+    var exitLeaderboardButton = document.createElement("button");
+    exitLeaderboardButton.class="leaderboard-button";
+    exitLeaderboardButton.textContent = "Exit Leaderboard";
+    exitLeaderboardButton.onclick = hideLeaderboard;
+    leaderboardSection.appendChild(exitLeaderboardButton);
+}
+
+var hideLeaderboard = function() {
+    leaderboardSection.innerHTML = "";
 }
 
 // EVENT HANDLERS
