@@ -69,7 +69,7 @@ var startQuiz = function() {
     // show the exit quiz button
     homeButton.style.display = "inline-block";
     // display the timer
-    timerElement.innerHTML = "<br>Time Remaining: 5:00";
+    timerElement.innerHTML = "<h3>Time Remaining: 5:00</h3>";
     // display the first question
     displayQuestion();
     // start the timer
@@ -85,7 +85,7 @@ var runTimer = function() {
         if (secondsLeft < 10) {
             secondsLeft = "0" + secondsLeft;
         }
-        timerElement.innerHTML = "<br>Time Remaining: " + minutesLeft + ":" + secondsLeft;
+        timerElement.innerHTML = "<h3>Time Remaining: " + minutesLeft + ":" + secondsLeft + "</h3>";
         // stop the timer once it runs out
         if (timeLeft === 0 || questionsAnswered === questions.length) {
             // alert the user if the time ran out
@@ -161,27 +161,33 @@ var displayHighScoreForm = function() {
     // create a container to hold the player name form
     var highScoreForm = document.createElement("form");
     highScoreForm.class = "save-score-form";
+    
+    // create a container for the form elements
+    var highScoreFormElements = document.createElement("div");
+    highScoreFormElements.className = "form-elements-container";
 
     // create the label for the input
     var playerNameLabel = document.createElement("label");
     playerNameLabel.setAttribute("for", "player-name")
     playerNameLabel.textContent = "Player:"
-    highScoreForm.append(playerNameLabel);
+    highScoreFormElements.append(playerNameLabel);
 
     // create the input
     var playerNameElement = document.createElement("input");
     playerNameElement.type = "text";
     playerNameElement.name = "player-name";
     playerNameElement.placeholder = "Name or Initials";
-    highScoreForm.append(playerNameElement);
+    highScoreFormElements.append(playerNameElement);
 
     // create the button
     var playerNameSubmit = document.createElement("button");
     playerNameSubmit.type = "submit";
-    playerNameSubmit.textContent = "Save"
-    highScoreForm.append(playerNameSubmit);
+    playerNameSubmit.className = "form-button";
+    playerNameSubmit.textContent = "Save";
+    highScoreFormElements.append(playerNameSubmit);
 
     // add the form to the DOM
+    highScoreForm.append(highScoreFormElements);
     highScoreFormSection.append(highScoreForm);
 }
 
