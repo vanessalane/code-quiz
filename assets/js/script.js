@@ -19,7 +19,7 @@ var highScores = [];
 var questionsAnswered;
 var questions = [
     {
-        question: "Which of the following is NOT a valid way to define a JS variable?",
+        question: "Which of the following is NOT a valid way to declare a JS variable?",
         answers: [
             {text: "var foo;", score: 0, correct: false},
             {text: "var foo = bar;", score: 0, correct: false},
