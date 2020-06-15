@@ -1,65 +1,76 @@
 // get relevant DOM elements
-var startButton = document.getElementById("startButton");
+var startButton = document.getElementById("start-quiz");
+var saveScoreButton = document.getElementById("save-score");
 var timerElement = document.getElementById("timer");
-var scoreElement = document.getElementById("currentScore");
-var questionElement = document.getElementById("question-text");
+var finalScoreElement = document.getElementById("final-score");
+var quizContentElement = document.getElementById("quiz-content");
+var questionElement = document.getElementById("question");
 var answersContainerElement = document.getElementById("answers-container");
 var answerMessageElement = document.getElementById("answer-message");
+var highScoreElement = document.getElementById("high-score-content");
 
 // define global variables
-var timeLeft = 300000;
-var score = 0;
-var questionsAnswered = 0;
+var timeLeft;
+var score;
+var questionsAnswered;
 var questions = [
     {
         question: "Which of the following is NOT a valid way to define a JS variable?",
         answers: [
-            {text: "var foo;", score: 0},
-            {text: "var foo = bar;", score: 0},
-            {text: "let foo = bar;", score: 0},
-            {text: "foo = bar;", score: 5},
+            {text: "var foo;", score: 0, correct: false},
+            {text: "var foo = bar;", score: 0, correct: false},
+            {text: "let foo = bar;", score: 0, correct: false},
+            {text: "foo = bar;", score: 5, correct: true}
         ]
     },
     {
         question: "Which of the following is a valid way to define a JS function?",
         answers: [
-            {text: "function foo;", score: 5},
-            {text: "var foo = bar() {console.log('something');}", score: 0},
-            {text: "var foo = function() {console.log('something');}", score: 5},
-            {text: "function() {console.log('something')}", score: 0},
+            {text: "function foo;", score: 0, correct: false},
+            {text: "var foo = bar() {console.log('something');}", score: 0, correct: false},
+            {text: "var foo = function() {console.log('something');}", score: 5, correct: true},
+            {text: "function() {console.log('something')}", score: 0, correct: false}
         ]
     },
     {
         question: "What does JSON stand for?",
         answers: [
-            {text: "JavaScript Object Notation", score: 5},
-            {text: "JavaScript Online Notes", score: 0},
-            {text: "JavaScript Outline Network", score: 0},
-            {text: "JSON does not stand for anything", score: 0},
+            {text: "JavaScript Object Notation", score: 5, correct: true},
+            {text: "JavaScript Online Notes", score: 0, correct: false},
+            {text: "JavaScript Outline Network", score: 0, correct: false},
+            {text: "JSON does not stand for anything", score: 0, correct: false}
         ]
     },
     {
         question: "True or False: JavaScript arrays are defined with square brackets ([]).",
         answers: [
-            {text: "True", score: 5},
-            {text: "False", score: 0}
+            {text: "True", score: 5, correct: true},
+            {text: "False", score: 0, correct: false}
         ]
     },
     {
         question: "True or False: JavaScript object values must be strings.",
         answers: [
-            {text: "True", score: 0},
-            {text: "False", score: 5}
+            {text: "True", score: 0, correct: false},
+            {text: "False", score: 5, correct: true}
         ]
     }
 ]
+var highScores = [];
 
 var startQuiz = function() {
-    // setup the header
+    // set default values
+    timeLeft = 300000;
+    score = 0;
+    questionsAnswered = 0;
+    // hide the final score from the previous game
+    finalScoreElement.textContent = "";
+    // hide the start and save score buttons
     startButton.style.display = "none";
-    scoreElement.textContent = "Score: " + score;
+    saveScoreButton.style.display = "none";
+    // display the timer
     timerElement.textContent = "Time Left: 5:00";
-    // start displaying the questions
+    // display the first question
     displayQuestion();
     answerMessageElement.textContent = "";
     // start the timer
@@ -84,16 +95,24 @@ var runTimer = function() {
             }
             // stop the timer
             clearInterval(timer);
-            // prominently display the final score and start button
-            questionElement.textContent = "Final Score: " + score;
-            answersContainerElement.innerHTML = "";
-            startButton.style.display = "inline-block";
+            endQuiz();
         }
     }, 1000);
 }
 
-var displayQuestion = function() {
+var endQuiz = function() {
+    // stop displaying the question and answer
+    questionElement.textContent = "";
+    answersContainerElement.innerHTML = "";
     answerMessageElement.textContent = "";
+    // display the user's score
+    finalScoreElement.textContent = "Final Score: " + score;
+    // display the start game and save score buttons
+    startButton.style.display = "inline-block";
+    saveScoreButton.style.display = "inline-block";
+}
+
+var displayQuestion = function() {
     if (questionsAnswered < questions.length) {
         // add the question to the dom
         questionElement.textContent = questions[questionsAnswered].question;
@@ -114,25 +133,75 @@ var displayQuestion = function() {
 var answerClickHandler = function(event) {
     // figure out the answer and the score
     var answerId = event.target.id;
-    var answerScore = questions[questionsAnswered].answers[answerId].score;
-    // apply a 10 second penalty for a wrong answer
-    if (answerScore === 0) {
-        timeLeft -= 10000;
-        answerMessageElement.textContent = "Wrong answer!";
-        // clear the answer message after a couple of seconds
-        setTimeout(function() {
-            answerMessageElement.textContent = "";
-        }, 2000)
+    if (answerId === "answers-container") {
+        return false;
     } 
-    // update the total score based on the answerScore
-    else {
-        score += answerScore;
-        scoreElement.textContent = "Current Score: " + score;
-        // display the next question
-        questionsAnswered++
-        displayQuestion()
+    var answerScore = questions[questionsAnswered].answers[answerId].score;
+    var correctAnswer = questions[questionsAnswered].answers[answerId].correct;
+    // apply a 10 second penalty for a wrong answer
+    if (correctAnswer) {
+        answerMessageElement.textContent = "Correct!";
+    } else {
+        timeLeft -= 10000;
+        answerMessageElement.textContent = "Wrong!";
     }
+    // update the total score based on the answerScore
+    score += answerScore;
+    // display the next question
+    questionsAnswered++
+    displayQuestion()
+    // clear the answer message after a couple of seconds
+    setTimeout(function() {
+        answerMessageElement.textContent = "";
+    }, 2000)
+}
+
+var saveScoreClickHandler = function(event) {
+    // create a container to hold the player name form
+    var saveScoreForm = document.createElement("form");
+    saveScoreForm.class = "save-score-form";
+    // create the label for the input
+    var playerNameLabel = document.createElement("label");
+    playerNameLabel.setAttribute("for", "player-name")
+    playerNameLabel.textContent = "Player:"
+    saveScoreForm.append(playerNameLabel);
+    // create the input
+    var playerNameElement = document.createElement("input");
+    playerNameElement.type = "text";
+    playerNameElement.name = "player-name";
+    playerNameElement.placeholder = "Name or Initials";
+    saveScoreForm.append(playerNameElement);
+    // create the button
+    var playerNameSubmit = document.createElement("button");
+    playerNameSubmit.type = "submit";
+    playerNameSubmit.textContent = "Save My Score"
+    saveScoreForm.append(playerNameSubmit);
+    // hide the other button
+    saveScoreButton.style.display = "none";
+    // add the form to the DOM
+    highScoreElement.append(saveScoreForm);
+}
+
+var saveScoreFormHandler = function(event) {
+    event.preventDefault();
+    var playerName = event.target.querySelector("input[name='player-name']").value;
+    if (!playerName) {
+        playerName = "Anonymous";
+    }
+    // create the score object
+    var scoreObject = {
+        player: playerName,
+        score: score
+    }
+    // add it to the highScores array
+    highScores.push(scoreObject);
+    // add it to local storage
+    localStorage.setItem("highScores", JSON.stringify(highScores));
+    // hide the form
+    highScoreElement.innerHTML = '';
 }
 
 startButton.addEventListener("click", startQuiz);
 answersContainerElement.addEventListener("click", answerClickHandler);
+saveScoreButton.addEventListener("click", saveScoreClickHandler);
+highScoreElement.addEventListener("submit", saveScoreFormHandler);
