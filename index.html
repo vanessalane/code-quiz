@@ -7,22 +7,24 @@
 </head>
 <body>
     <header>
-        <button id="high-scores">High Scores</button>
+        <button id="leaderboard-button">Leaderboard</button>
         <h1>Code Quiz</h1>
         <div>
             <p id="timer"></p>
         </div>
     </header>
     <main>
-        <div id="quiz-content">
+        <section id="quiz">
             <p id="final-score"></p>
-            <p id ="question"></p>
-            <div id ="answers-container"></div>
-            <p id="answer-message"></p>
-        </div>
-        <div id="high-score-content"></div>
-        <button id="start-quiz">Start the Quiz</button>
-        <button id="save-high-score" style="display:none;">Add High Score</button>
+            <button id="start-quiz">Start the Quiz</button>
+            <h2 id="question"></h2>
+            <div id="answers-container"></div>
+            <div id="answer-message"></div>
+        </section>
+        <section id="high-score-form">
+        </section>
+        <section id="leaderboard">
+        </section>
     </main>
     <script src="assets/js/script.js"></script>
 </body>

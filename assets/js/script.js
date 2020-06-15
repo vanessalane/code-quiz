@@ -5,12 +5,14 @@ var timeLeft;
 var timerElement = document.getElementById("timer");
 // score variables
 var finalScoreElement = document.getElementById("final-score");
-var addHighScoreButton = document.getElementById("save-high-score");
-var highScoreContainer = document.getElementById("high-score-content");
+var highScoreFormSection = document.getElementById("high-score-form");
 var score;
+var highScore = 0;
 var highScores = [];
+// leaderboard variables
+var leaderboardButton = document.getElementById("leaderboard-button");
+var leaderboardSection = document.getElementById("leaderboard");
 // quiz question and answer variables
-var quizContentElement = document.getElementById("quiz-content");
 var questionElement = document.getElementById("question");
 var answersContainerElement = document.getElementById("answers-container");
 var answerMessageElement = document.getElementById("answer-message");
@@ -65,16 +67,16 @@ var startQuiz = function() {
     timeLeft = 300000;
     score = 0;
     questionsAnswered = 0;
-    // hide the final score from the previous game
+    // hide the final score and leaderboard from the previous game
     finalScoreElement.textContent = "";
-    // hide the start and save score buttons
+    leaderboardSection.innerHTML = "";
+    // hide the start and leaderboard buttons
     startButton.style.display = "none";
-    addHighScoreButton.style.display = "none";
+    leaderboardButton.style.display = "none";
     // display the timer
     timerElement.textContent = "Time Left: 5:00";
     // display the first question
     displayQuestion();
-    answerMessageElement.textContent = "";
     // start the timer
     runTimer();
 }
@@ -102,18 +104,6 @@ var runTimer = function() {
     }, 1000);
 }
 
-var endQuiz = function() {
-    // stop displaying the question and answer
-    questionElement.textContent = "";
-    answersContainerElement.innerHTML = "";
-    answerMessageElement.textContent = "";
-    // display the user's score
-    finalScoreElement.textContent = "Final Score: " + score;
-    // display the start game and save score buttons
-    startButton.style.display = "inline-block";
-    addHighScoreButton.style.display = "inline-block";
-}
-
 var displayQuestion = function() {
     if (questionsAnswered < questions.length) {
         // add the question to the dom
@@ -122,7 +112,7 @@ var displayQuestion = function() {
         if (answersContainerElement.children.length > 0) {
             answersContainerElement.innerHTML = "";
         }
-        for (i=0; i < questions[questionsAnswered].answers.length; i++) {
+        for (let i=0; i < questions[questionsAnswered].answers.length; i++) {
             var answerButton = document.createElement("button");
             answerButton.className = "answer-button";
             answerButton.id = i;
@@ -140,7 +130,7 @@ var answerClickHandler = function(event) {
     } 
     var answerScore = questions[questionsAnswered].answers[answerId].score;
     var correctAnswer = questions[questionsAnswered].answers[answerId].correct;
-    // apply a 10 second penalty for a wrong answer
+    // apply a 10 second penalty for a wrong answer and display a message
     if (correctAnswer) {
         answerMessageElement.textContent = "Correct!";
     } else {
@@ -158,53 +148,96 @@ var answerClickHandler = function(event) {
     }, 2000)
 }
 
-var addHighScoreClickHandler = function(event) {
+var endQuiz = function() {
+    // stop displaying the question and answer
+    questionElement.textContent = "";
+    answersContainerElement.innerHTML = "";
+    answerMessageElement.textContent = "";
+    // display the user's score
+    finalScoreElement.textContent = "Final Score: " + score;
+    // display the start game button
+    startButton.style.display = "inline-block";
+    startButton.textContent = "Retake Quiz"
+    // handle high scores
+    if (score >= highScore) {
+        highScore = score;
+    }
+    displayHighScoreForm();
+}
+
+var displayHighScoreForm = function() {
+    highScoreFormSection.innerHTML = "<h2>Add your score to the leaderboard!</h2>";
     // create a container to hold the player name form
     var highScoreForm = document.createElement("form");
     highScoreForm.class = "save-score-form";
+
     // create the label for the input
     var playerNameLabel = document.createElement("label");
     playerNameLabel.setAttribute("for", "player-name")
     playerNameLabel.textContent = "Player:"
     highScoreForm.append(playerNameLabel);
+
     // create the input
     var playerNameElement = document.createElement("input");
     playerNameElement.type = "text";
     playerNameElement.name = "player-name";
     playerNameElement.placeholder = "Name or Initials";
     highScoreForm.append(playerNameElement);
+
     // create the button
     var playerNameSubmit = document.createElement("button");
     playerNameSubmit.type = "submit";
-    playerNameSubmit.textContent = "Add My High Score"
+    playerNameSubmit.textContent = "Save"
     highScoreForm.append(playerNameSubmit);
-    // hide the Save Score button
-    addHighScoreButton.style.display = "none";
+
     // add the form to the DOM
-    highScoreContainer.append(highScoreForm);
+    highScoreFormSection.append(highScoreForm);
 }
 
 var highScoreSubmitHandler = function(event) {
     event.preventDefault();
+    // create the score object
     var playerName = event.target.querySelector("input[name='player-name']").value;
     if (!playerName) {
         playerName = "Anonymous";
     }
-    // create the score object
     var scoreObject = {
         player: playerName,
         score: score
     }
     // add it to the highScores array
     highScores.push(scoreObject);
-    // add it to local storage
+    // get other scores from localStorage
     localStorage.setItem("highScores", JSON.stringify(highScores));
     // hide the form
-    highScoreContainer.innerHTML = '';
+    highScoreFormSection.innerHTML = '';
+    // display the leaderboard instead
+    displayLeaderboard();
+}
+
+var displayLeaderboard = function() {
+    highScores = JSON.parse(localStorage.getItem("highScores"));
+    // create the list element
+    var highScoresListElement = document.createElement("ol");
+    highScoresListElement.className = "high-scores-list";
+    for (let i = 0; i < highScores.length; i++) {
+        // create the high score list item
+        var highScoreElement = document.createElement("li");
+        highScoreElement.className = "high-score-list-item";
+        // create the container and high score information
+        var highScoreContainer = document.createElement("div");
+        highScoreContainer.class="high-score-container";
+        highScoreContainer.innerHTML = "<h3 class='high-score-player'>" + highScores[i].player + "</h3><span class='high-score-value'>" + highScores[i].score + "</span>";
+        // append the list item to the list
+        highScoreElement.append(highScoreContainer);
+        highScoresListElement.append(highScoreElement);
+    }
+    // append the list to the leaderboard section
+    leaderboardSection.appendChild(highScoresListElement);
 }
 
 // EVENT HANDLERS
 startButton.addEventListener("click", startQuiz);
 answersContainerElement.addEventListener("click", answerClickHandler);
-addHighScoreButton.addEventListener("click", addHighScoreClickHandler);
-highScoreContainer.addEventListener("submit", highScoreSubmitHandler);
+highScoreFormSection.addEventListener("submit", highScoreSubmitHandler);
+leaderboardButton.addEventListener("click", displayLeaderboard);
