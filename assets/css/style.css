@@ -67,3 +67,62 @@ input {
     border: 1px solid #c7c1bf;
     border-radius: 5px;
 }
+
+/* Tablets and Smaller */
+@media screen and (max-width: 780px) {
+    header {
+        margin-top: 30px;
+    }
+    h1 {
+        font-size: 8vw;
+    }
+    h2 {
+        font-size: 4vw;
+    }
+    h3, button, main, input {
+        font-size: 3vw;
+    }
+    section {
+        width: 75%;
+    }
+    input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    #home-button {
+        width: 100%;
+        left: auto;
+        position: relative;
+    }
+}
+/* Mobile Phones and Smaller */
+@media screen and (max-width: 575px) {
+    header {
+        margin-top: 0px;
+    }
+    h1 {
+        font-size: 10vw;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    h2 {
+        font-size: 7vw;
+    }
+    h3, button, main, input {
+        font-size: 5vw;
+    }
+    button {
+        width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    section {
+        width: 90%;
+    }
+}
