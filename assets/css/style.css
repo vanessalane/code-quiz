@@ -1,0 +1,69 @@
+* {
+    background: #F6F4F3;
+    font-family: 'Roboto Mono', monospace;
+}
+header {
+    text-align: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+h1 {
+    font-size: 54px;
+}
+li {
+    text-align: left;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+/* Button Styles */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+}
+button {
+    border-radius: 30px;
+    background: #16425B;
+    color: #ffffff;
+    padding-top: 16px;;
+    padding-bottom: 16px;
+    margin: 8px;
+    font-size: 16px;
+    border: 0px;
+}
+button:hover {
+    background: #2F6690;
+}
+.leaderboard-button {
+    margin-top: 24px;
+}
+
+/* Quiz Styles */
+#home-button {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #ded7d4;
+    color: #16425B;
+    padding: 16px;
+}
+#home-button:hover {
+    background-color: #c7c1bf;
+}
+
+/* High Score Form Styles */
+input {
+    padding: 16px;
+    margin-left: 16px;
+    margin-right: 16px;
+    border: 1px solid #c7c1bf;
+    border-radius: 5px;
+}

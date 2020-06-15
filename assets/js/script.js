@@ -1,21 +1,21 @@
-// GLOBAL VARIABLES
-// quiz admin DOM elements
-var startButton = document.getElementById("start-quiz");
-var timeLeft;
-var timerElement = document.getElementById("timer");
-// score variables
-var finalScoreElement = document.getElementById("final-score");
+// DOM elements
+var headingElement = document.getElementById("quiz-heading");
+var leaderboardButton = document.getElementById("leaderboard-button");
+var startQuizButton = document.getElementById("start-quiz-button");
+var homeButton = document.getElementById("home-button");
+var questionContainer = document.getElementById("question-container");
+var answersContainer = document.getElementById("answers-container");
 var highScoreFormSection = document.getElementById("high-score-form");
+var finalScoreContainer = document.getElementById("final-score-container");
+var leaderboardSection = document.getElementById("leaderboard");
+var timerElement = document.getElementById("timer");
+
+// other global variables
 var score;
+var timeLeft;
+var timerInterval;
 var highScore = 0;
 var highScores = [];
-// leaderboard variables
-var leaderboardButton = document.getElementById("leaderboard-button");
-var leaderboardSection = document.getElementById("leaderboard");
-// quiz question and answer variables
-var questionElement = document.getElementById("question");
-var answersContainerElement = document.getElementById("answers-container");
-var answerMessageElement = document.getElementById("answer-message");
 var questionsAnswered;
 var questions = [
     {
@@ -61,20 +61,15 @@ var questions = [
     }
 ]
 
-// FUNCTIONS
 var startQuiz = function() {
-    // set default values
-    timeLeft = 300000;
-    score = 0;
-    questionsAnswered = 0;
-    // hide the final score and leaderboard from the previous game
-    finalScoreElement.textContent = "";
-    leaderboardSection.innerHTML = "";
+    resetQuiz();
     // hide the start and leaderboard buttons
-    startButton.style.display = "none";
+    startQuizButton.style.display = "none";
     leaderboardButton.style.display = "none";
+    // show the exit quiz button
+    homeButton.style.display = "inline-block";
     // display the timer
-    timerElement.textContent = "Time Left: 5:00";
+    timerElement.innerHTML = "<br>Time Remaining: 5:00";
     // display the first question
     displayQuestion();
     // start the timer
@@ -82,7 +77,7 @@ var startQuiz = function() {
 }
 
 var runTimer = function() {
-    var timer = setInterval(function () {
+    timerInterval = setInterval(function () {
         timeLeft = timeLeft - 1000;
         // parse the time so that it's easier for the user to read
         let minutesLeft = Math.floor(timeLeft/60000);
@@ -90,7 +85,7 @@ var runTimer = function() {
         if (secondsLeft < 10) {
             secondsLeft = "0" + secondsLeft;
         }
-        timerElement.textContent = "Time Left: " + minutesLeft + ":" + secondsLeft;
+        timerElement.innerHTML = "<br>Time Remaining: " + minutesLeft + ":" + secondsLeft;
         // stop the timer once it runs out
         if (timeLeft === 0 || questionsAnswered === questions.length) {
             // alert the user if the time ran out
@@ -98,7 +93,7 @@ var runTimer = function() {
                 alert("Time's up!");
             }
             // stop the timer
-            clearInterval(timer);
+            clearInterval(timerInterval);
             endQuiz();
         }
     }, 1000);
@@ -107,17 +102,18 @@ var runTimer = function() {
 var displayQuestion = function() {
     if (questionsAnswered < questions.length) {
         // add the question to the dom
-        questionElement.textContent = questions[questionsAnswered].question;
+        questionContainer.innerHTML = "<h2>" + questions[questionsAnswered].question + "</h2>";
         // create the answer elements
-        if (answersContainerElement.children.length > 0) {
-            answersContainerElement.innerHTML = "";
+        answersContainer.className = "buttons-container";
+        if (answersContainer.children.length > 0) {
+            answersContainer.innerHTML = "";
         }
         for (let i=0; i < questions[questionsAnswered].answers.length; i++) {
             var answerButton = document.createElement("button");
             answerButton.className = "answer-button";
             answerButton.id = i;
             answerButton.textContent = questions[questionsAnswered].answers[i].text;
-            answersContainerElement.appendChild(answerButton);
+            answersContainer.appendChild(answerButton);
         }
     }
 }
@@ -131,34 +127,26 @@ var answerClickHandler = function(event) {
     var answerScore = questions[questionsAnswered].answers[answerId].score;
     var correctAnswer = questions[questionsAnswered].answers[answerId].correct;
     // apply a 10 second penalty for a wrong answer and display a message
-    if (correctAnswer) {
-        answerMessageElement.textContent = "Correct!";
-    } else {
+    if (!correctAnswer) {
         timeLeft -= 10000;
-        answerMessageElement.textContent = "Wrong!";
     }
     // update the total score based on the answerScore
     score += answerScore;
     // display the next question
-    questionsAnswered++
-    displayQuestion()
-    // clear the answer message after a couple of seconds
-    setTimeout(function() {
-        answerMessageElement.textContent = "";
-    }, 2000)
+    questionsAnswered++;
+    displayQuestion();
 }
 
 var endQuiz = function() {
     // stop displaying the question and answer
-    questionElement.textContent = "";
-    answersContainerElement.innerHTML = "";
-    answerMessageElement.textContent = "";
+    questionContainer.innerHTML = "";
+    answersContainer.innerHTML = "";
+    answersContainer.className = "";
     // display the user's score
-    finalScoreElement.textContent = "Final Score: " + score;
-    // display the start game and leaderboard buttons
-    startButton.style.display = "inline-block";
-    startButton.textContent = "Retake Quiz"
-    leaderboardButton.style.display = "inline-block";
+    finalScoreContainer.innerHTML = "<h3>Final Score: " + score + " points</h3>";
+    // give the user the option to retake the quiz
+    startQuizButton.style.display = "inline-block";
+    startQuizButton.textContent = "Retake Quiz"
     // handle high scores
     if (score >= highScore) {
         highScore = score;
@@ -167,7 +155,9 @@ var endQuiz = function() {
 }
 
 var displayHighScoreForm = function() {
+    // add the title to the form
     highScoreFormSection.innerHTML = "<h2>Add your score to the leaderboard!</h2>";
+
     // create a container to hold the player name form
     var highScoreForm = document.createElement("form");
     highScoreForm.class = "save-score-form";
@@ -205,14 +195,15 @@ var highScoreSubmitHandler = function(event) {
     // get the time the score was recorded
     var timestamp = new Date();
     var date = (timestamp.getMonth() + 1) + "/" + timestamp.getDate() + '/' + timestamp.getFullYear();
-    var time = timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds();
-    var dateTime = date + ' ' + time;
     var scoreObject = {
         player: playerName,
         score: score,
-        date: dateTime
+        date: date
     }
     // add it to the highScores array
+    if (score > highScore) {
+        highScore = score;
+    }
     highScores.push(scoreObject);
     // get other scores from localStorage
     localStorage.setItem("highScores", JSON.stringify(highScores));
@@ -223,20 +214,25 @@ var highScoreSubmitHandler = function(event) {
 }
 
 var displayLeaderboard = function() {
-    // hide the quiz section
+    // reset the buttons and title
+    resetQuiz();
+
+    // hide the leaderboard since we're already on it
+    headingElement.textContent = "Leaderboard";
     leaderboardButton.style.display = "none";
-    startButton.style.display="none";
-    timerElement.textContent = "";
-    finalScoreElement.textContent = "";
-    question.textContent = "";
-    answersContainerElement.innerHTML = "";
+
+    // update the startQuizButton and homeButton elements
+    startQuizButton.textContent="Retake the Quiz";
+    homeButton.style.display="inline-block";
 
     // get all of the scores from localStorage
-    loadedScores = JSON.parse(localStorage.getItem("highScores"));
+    var loadedScores = JSON.parse(localStorage.getItem("highScores"));
+
     if (!loadedScores) {
-        leaderboardSection.innerHTML = "<h2>Leaderboard</h2><p>No scores saved!</p>";
+        leaderboardSection.innerHTML = "<p>No scores saved!</p>";
     } else {
-        leaderboardSection.innerHTML = "<h2>Leaderboard</h2>";
+        // sort the score objects based on score
+        loadedScores.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
         // create the list element
         var scoresList = document.createElement("ol");
         scoresList.className = "scores-list";
@@ -253,36 +249,51 @@ var displayLeaderboard = function() {
 
         // create clear high scores button and append to the end of the leaderboard
         var clearLeaderboardButton = document.createElement("button");
-        clearLeaderboardButton.class="leaderboard-button";
+        clearLeaderboardButton.className = "leaderboard-button";
         clearLeaderboardButton.textContent = "Clear High Scores";
         clearLeaderboardButton.onclick = clearLeaderboard;
         leaderboardSection.appendChild(clearLeaderboardButton);
-    }
-
-    // create exit button and append to the end of the leaderboard
-    var exitLeaderboardButton = document.createElement("button");
-    exitLeaderboardButton.class="leaderboard-button";
-    exitLeaderboardButton.textContent = "Exit Leaderboard";
-    exitLeaderboardButton.onclick = hideLeaderboard;
-    leaderboardSection.appendChild(exitLeaderboardButton);
-
-}
-
-var hideLeaderboard = function() {
-    leaderboardSection.innerHTML = "";
-    leaderboardButton.style.display = "inline-block";
-    startButton.style.display = "inline-block";
+    } 
 }
 
 var clearLeaderboard = function() {
     localStorage.clear();
-    leaderboardButton.style.display = "inline-block";
-    leaderboardSection.innerHTML = "";
-    startButton.style.display = "inline-block";
+    resetQuiz();
 }
 
-// EVENT HANDLERS
-startButton.addEventListener("click", startQuiz);
-answersContainerElement.addEventListener("click", answerClickHandler);
-highScoreFormSection.addEventListener("submit", highScoreSubmitHandler);
+var resetQuiz = function() {
+    // stop the timer
+    clearInterval(timerInterval);
+    timerElement.innerHTML = "";
+
+    // reset the title
+    headingElement.textContent = "JavaScript Quiz";
+
+    // reset the navigation buttons
+    leaderboardButton.style.display = "inline-block";
+    startQuizButton.style.display = "inline-block";
+    startQuizButton.textContent = "Start Quiz";
+    homeButton.style.display = "none";
+
+    // clear out the quiz container
+    questionContainer.innerHTML = "";
+    answersContainer.innerHTML = "";
+    finalScoreContainer.innerHTML = "";
+
+    // clear the high score form container
+    highScoreFormSection.innerHTML = "";
+
+    // clear the leaderboard container
+    leaderboardSection.innerHTML = "";
+
+    // set default values
+    timeLeft = 300000;
+    score = 0;
+    questionsAnswered = 0;
+}
+
+homeButton.addEventListener("click", resetQuiz);
+startQuizButton.addEventListener("click", startQuiz);
 leaderboardButton.addEventListener("click", displayLeaderboard);
+answersContainer.addEventListener("click", answerClickHandler);
+highScoreFormSection.addEventListener("submit", highScoreSubmitHandler);
