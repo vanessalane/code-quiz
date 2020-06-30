@@ -1,6 +1,7 @@
 # Code Quiz
 repo: https://github.com/vanessalane/code-quiz/
-deployed project:
+
+deployed project:https://vanessalane.github.io/code-quiz/
 
 ## User Story
 AS A coding boot camp student
