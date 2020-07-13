@@ -219,6 +219,13 @@ var highScoreSubmitHandler = function(event) {
     displayLeaderboard();
 }
 
+var clearLeaderboard = function() {
+    localStorage.clear();
+    resetQuiz();
+    highScores = [];
+    highScore = 0;
+}
+
 var displayLeaderboard = function() {
     // reset the buttons and title
     resetQuiz();
@@ -260,11 +267,6 @@ var displayLeaderboard = function() {
         clearLeaderboardButton.onclick = clearLeaderboard;
         leaderboardSection.appendChild(clearLeaderboardButton);
     } 
-}
-
-var clearLeaderboard = function() {
-    localStorage.clear();
-    resetQuiz();
 }
 
 var resetQuiz = function() {
